@@ -12,8 +12,10 @@
 #include "log4cxx/basicconfigurator.h"
 
 #include "itkAdditiveGaussianNoiseImageFilter.h"
+#include "itkImpulseNoiseImageFilter.h"
 
 typedef itk::AdditiveGaussianNoiseImageFilter< ImageType, ImageType > GaussianNoiseGenerator;
+typedef itk::ImpulseNoiseImageFilter< ImageType, ImageType > ImpulseNoiseGenerator;
 
 int main(int argc, char **argv)
 {
@@ -46,16 +48,33 @@ int main(int argc, char **argv)
 		exit(-1);
 	}
 
-	GaussianNoiseGenerator::Pointer noiseGenerator = GaussianNoiseGenerator::New();
-	noiseGenerator->SetInput(image);
-	noiseGenerator->SetMean(cli_parser.get_mean());
-	noiseGenerator->SetStandardDeviation(cli_parser.get_stddev());
+	const std::string noise_type = cli_parser.get_noise_type();
 
-	noiseGenerator->Update();
+	typedef itk::ImageToImageFilter< ImageType, ImageType >::Pointer FilterPointer;
+	FilterPointer noiseFilter;
 
-	LOG4CXX_DEBUG(logger, "Noise generated");
+	if(0 == noise_type.compare("gaussian")) {
+		GaussianNoiseGenerator::Pointer g = GaussianNoiseGenerator::New();
+		g->SetInput(image);
+		g->SetMean(cli_parser.get_mean());
+		g->SetStandardDeviation(cli_parser.get_stddev());
+		noiseFilter = FilterPointer(g);
+	} else if(0 == noise_type.compare("impulse")) {
+		ImpulseNoiseGenerator::Pointer i = ImpulseNoiseGenerator::New();
+		i->SetInput(image);
+		i->SetProbability(cli_parser.get_probability());
+		noiseFilter = FilterPointer(i);
+	} else {
+		LOG4CXX_FATAL(logger, "No noise called " << noise_type << " found.");
+	}
 
-	ImageWriter::write(noiseGenerator->GetOutput(), cli_parser.get_output_image());
+	if(noiseFilter.IsNotNull()) {
+		noiseFilter->Update();
+
+		LOG4CXX_DEBUG(logger, "Noise generated");
+
+		ImageWriter::write(noiseFilter->GetOutput(), cli_parser.get_output_image());
+	}
 
 	return 0;
 }

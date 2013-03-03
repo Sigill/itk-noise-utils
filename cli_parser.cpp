@@ -76,12 +76,18 @@ CliParser::ParseResult CliParser::parse_argv(int argc, char ** argv)
 		("output-image,o",
 			po::value< std::string >(&(this->output_image))->required(),
 			"Output image.")
+		("noise-type,n",
+			po::value< std::string >(&(this->noise_type))->required(),
+			"Noise type (gaussian, impulse).")
 		("mean,m",
 			po::value< Double >(&(this->mean))->default_value(0.0),
 			"Mean value of the generated noise.")
 		("stddev,s",
 			po::value< StrictlyPositiveDouble >(&(this->stddev))->default_value(1.0),
 			"Standard deviation value of the generated noise.")
+		("probability,p",
+			po::value< StrictlyPositiveDouble >(&(this->probability))->default_value(0.01),
+			"Probability of the generated noise.")
 		;
 
 	po::variables_map vm;
@@ -115,6 +121,11 @@ const std::string CliParser::get_output_image() const
 	return this->output_image;
 }
 
+const std::string CliParser::get_noise_type() const
+{
+	return this->noise_type;
+}
+
 const double CliParser::get_mean() const {
 	return this->mean;
 }
@@ -123,3 +134,7 @@ const double CliParser::get_stddev() const {
 	return this->stddev;
 }
 
+
+const double CliParser::get_probability() const {
+	return this->probability;
+}

@@ -55,13 +55,17 @@ public:
 
 	const std::string get_input_image() const;
 	const std::string get_output_image() const;
+	const std::string get_noise_type() const;
 	const double      get_mean() const;
 	const double      get_stddev() const;
+	const double      get_probability() const;
 
 private:
 	std::string            input_image, output_image;
+	std::string            noise_type;
 	Double                 mean;
 	StrictlyPositiveDouble stddev;
+	StrictlyPositiveDouble probability;
 };
 
 #endif /* _CLI_OPTIONS_H */
