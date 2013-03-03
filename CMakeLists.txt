@@ -15,6 +15,6 @@ INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIRS})
 FIND_PACKAGE(Log4Cxx REQUIRED)
 INCLUDE_DIRECTORIES(${LOG4CXX_INCLUDE_DIR})
 
-ADD_EXECUTABLE(main main.cpp time_utils.cpp cli_parser.cpp common.cpp image_reader.cpp image_writer.cpp ParseUtils.cpp itkThreadSafeMersenneTwisterRandomVariateGenerator.cxx)
+ADD_EXECUTABLE(main main.cpp time_utils.cpp cli_parser.cpp common.cpp image_reader.cpp image_writer.cpp ParseUtils.cpp)
 tARGET_LINK_LIBRARIES(main ${ITK_LIBRARIES} ${Boost_LIBRARIES} ${LOG4CXX_LIBRARIES})
 
