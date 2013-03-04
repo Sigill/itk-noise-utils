@@ -24,29 +24,38 @@ public:
   }
   ~ImpulseNoise() {}
 
-  double GetProbability() const { return m_Probability; }
-  void SetProbability(double probability) { m_Probability = probability; }
+  double GetProbability() const
+    { return m_Probability; }
 
-  TOutput GetOutputMinimum() const { return m_OutputMinimum; }
-  TOutput GetOutputMaximum() const { return m_OutputMaximum; }
+  void SetProbability(double probability)
+    { m_Probability = probability; }
 
-  void SetOutputMinimum( TOutput min ) { m_OutputMinimum = min; }
-  void SetOutputMaximum( TOutput max ) { m_OutputMaximum = max; }
+  TOutput GetOutputMinimum() const
+    { return m_OutputMinimum; }
+
+  TOutput GetOutputMaximum() const
+    { return m_OutputMaximum; }
+
+  void SetOutputMinimum( TOutput min )
+    { m_OutputMinimum = min; }
+
+  void SetOutputMaximum( TOutput max )
+    { m_OutputMaximum = max; }
 
   bool operator!=(const ImpulseNoise &other) const
-  {
+    {
     return m_Probability != other.m_Probability
-           || m_OutputMaximum != other.m_OutputMaximum
-           || m_OutputMinimum != other.m_OutputMinimum;
-  }
+      || m_OutputMaximum != other.m_OutputMaximum
+      || m_OutputMinimum != other.m_OutputMinimum;
+    }
 
   bool operator==(const ImpulseNoise & other) const
-  {
+    {
     return !( *this != other );
-  }
+    }
 
   inline TOutput operator()(const TInput & A) const
-  {
+    {
     if(vnl_sample_uniform(0., 1.) < m_Probability)
       {
       if(vnl_sample_uniform(0., 1.) < 0.5)
@@ -56,22 +65,21 @@ public:
       }
     else
       return static_cast<TOutput>(A);
-  }
+    }
 
 private:
   TOutput m_OutputMinimum;
   TOutput m_OutputMaximum;
   double m_Probability;
-};
-}
+  };
+} // End namespace Functor
 
 template< class TInputImage, class TOutputImage >
 class ITK_EXPORT ImpulseNoiseImageFilter:
-  public
-  UnaryFunctorImageFilter< TInputImage, TOutputImage,
-                           Functor::ImpulseNoise<
-                             typename TInputImage::PixelType,
-                             typename TOutputImage::PixelType >   >
+public UnaryFunctorImageFilter< TInputImage, TOutputImage,
+                                Functor::ImpulseNoise<
+                                  typename TInputImage::PixelType,
+                                  typename TOutputImage::PixelType > >
 {
 public:
   /** Standard class typedefs. */
@@ -79,7 +87,7 @@ public:
   typedef UnaryFunctorImageFilter<
     TInputImage, TOutputImage,
     Functor::ImpulseNoise< typename TInputImage::PixelType,
-                       typename TOutputImage::PixelType > >  Superclass;
+                           typename TOutputImage::PixelType > >  Superclass;
 
   typedef SmartPointer< Self >       Pointer;
   typedef SmartPointer< const Self > ConstPointer;
@@ -93,50 +101,51 @@ public:
   itkTypeMacro(ImpulseNoiseImageFilter, UnaryFunctorImageFilter);
 
   OutputPixelType GetOutputMinimum() const
-  {
+    {
     return this->GetFunctor().GetOutputMinimum();
-  }
+    }
 
   OutputPixelType GetOutputMaximum() const
-  {
+    {
     return this->GetFunctor().GetOutputMaximum();
-  }
+    }
 
-  float GetProbability() const { return this->GetFunctor().GetProbability(); }
+  float GetProbability() const
+    { return this->GetFunctor().GetProbability(); }
 
   void SetOutputMinimum(OutputPixelType min)
-  {
+    {
     if ( min == this->GetFunctor().GetOutputMinimum() )
       {
       return;
       }
     this->GetFunctor().SetOutputMinimum(min);
     this->Modified();
-  }
+    }
 
   void SetOutputMaximum(OutputPixelType max)
-  {
+    {
     if ( max == this->GetFunctor().GetOutputMaximum() )
       {
       return;
       }
     this->GetFunctor().SetOutputMaximum(max);
     this->Modified();
-  }
+    }
 
   void SetProbability(double probability)
-  {
+    {
     if ( probability == this->GetFunctor().GetProbability() )
       {
       return;
       }
     this->GetFunctor().SetProbability(probability);
     this->Modified();
-  }
+    }
 
 #ifdef ITK_USE_CONCEPT_CHECKING
   itkConceptMacro( InputConvertibleToOutputCheck,
-                   ( Concept::Convertible< typename TInputImage::PixelType, OutputPixelType > ) );
+    ( Concept::Convertible< typename TInputImage::PixelType, OutputPixelType > ) );
 #endif
 
   void PrintSelf(std::ostream& os, Indent indent) const
@@ -156,6 +165,6 @@ private:
   void operator=(const Self &);     //purposely not implemented
 };
 
-}
+} // End namespace itk
 
 #endif /* __itkImpulseNoiseImageFilter */
