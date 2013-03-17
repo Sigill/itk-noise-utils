@@ -12,9 +12,11 @@
 #include "log4cxx/basicconfigurator.h"
 
 #include "itkAdditiveGaussianNoiseImageFilter.h"
+#include "itkSparseAdditiveGaussianNoiseImageFilter.h"
 #include "itkImpulseNoiseImageFilter.h"
 
 typedef itk::AdditiveGaussianNoiseImageFilter< ImageType, ImageType > GaussianNoiseGenerator;
+typedef itk::SparseAdditiveGaussianNoiseImageFilter< ImageType, ImageType > SparseGaussianNoiseGenerator;
 typedef itk::ImpulseNoiseImageFilter< ImageType, ImageType > ImpulseNoiseGenerator;
 
 int main(int argc, char **argv)
@@ -53,17 +55,24 @@ int main(int argc, char **argv)
 	typedef itk::ImageToImageFilter< ImageType, ImageType >::Pointer FilterPointer;
 	FilterPointer noiseFilter;
 
-	if(0 == noise_type.compare("gaussian")) {
-		GaussianNoiseGenerator::Pointer g = GaussianNoiseGenerator::New();
-		g->SetInput(image);
-		g->SetMean(cli_parser.get_mean());
-		g->SetStandardDeviation(cli_parser.get_stddev());
-		noiseFilter = FilterPointer(g);
+	if(0 == noise_type.compare("awg")) {
+		GaussianNoiseGenerator::Pointer ng = GaussianNoiseGenerator::New();
+		ng->SetInput(image);
+		ng->SetMean(cli_parser.get_mean());
+		ng->SetStandardDeviation(cli_parser.get_stddev());
+		noiseFilter = FilterPointer(ng);
+	} else if(0 == noise_type.compare("sawg")) {
+		SparseGaussianNoiseGenerator::Pointer ng = SparseGaussianNoiseGenerator::New();
+		ng->SetInput(image);
+		ng->SetProbability(cli_parser.get_probability());
+		ng->SetMean(cli_parser.get_mean());
+		ng->SetStandardDeviation(cli_parser.get_stddev());
+		noiseFilter = FilterPointer(ng);
 	} else if(0 == noise_type.compare("impulse")) {
-		ImpulseNoiseGenerator::Pointer i = ImpulseNoiseGenerator::New();
-		i->SetInput(image);
-		i->SetProbability(cli_parser.get_probability());
-		noiseFilter = FilterPointer(i);
+		ImpulseNoiseGenerator::Pointer ng = ImpulseNoiseGenerator::New();
+		ng->SetInput(image);
+		ng->SetProbability(cli_parser.get_probability());
+		noiseFilter = FilterPointer(ng);
 	} else {
 		LOG4CXX_FATAL(logger, "No noise called " << noise_type << " found.");
 	}
