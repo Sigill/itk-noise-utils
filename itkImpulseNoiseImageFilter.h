@@ -27,7 +27,7 @@ public:
   double GetProbability() const
     { return m_Probability; }
 
-  void SetProbability(double probability)
+  void SetProbability(const double probability)
     { m_Probability = probability; }
 
   TOutput GetOutputMinimum() const
@@ -36,10 +36,10 @@ public:
   TOutput GetOutputMaximum() const
     { return m_OutputMaximum; }
 
-  void SetOutputMinimum( TOutput min )
+  void SetOutputMinimum( const TOutput min )
     { m_OutputMinimum = min; }
 
-  void SetOutputMaximum( TOutput max )
+  void SetOutputMaximum( const TOutput max )
     { m_OutputMaximum = max; }
 
   bool operator!=(const ImpulseNoise &other) const
@@ -56,7 +56,7 @@ public:
 
   inline TOutput operator()(const TInput & A) const
     {
-    if(vnl_sample_uniform(0., 1.) < m_Probability)
+    if(vnl_sample_uniform(0., 1.) <= m_Probability)
       {
       if(vnl_sample_uniform(0., 1.) < 0.5)
         return static_cast<TOutput>(m_OutputMinimum);
@@ -110,10 +110,10 @@ public:
     return this->GetFunctor().GetOutputMaximum();
     }
 
-  float GetProbability() const
+  double GetProbability() const
     { return this->GetFunctor().GetProbability(); }
 
-  void SetOutputMinimum(OutputPixelType min)
+  void SetOutputMinimum(const OutputPixelType min)
     {
     if ( min == this->GetFunctor().GetOutputMinimum() )
       {
@@ -123,7 +123,7 @@ public:
     this->Modified();
     }
 
-  void SetOutputMaximum(OutputPixelType max)
+  void SetOutputMaximum(const OutputPixelType max)
     {
     if ( max == this->GetFunctor().GetOutputMaximum() )
       {
@@ -133,7 +133,7 @@ public:
     this->Modified();
     }
 
-  void SetProbability(double probability)
+  void SetProbability(const double probability)
     {
     if ( probability == this->GetFunctor().GetProbability() )
       {

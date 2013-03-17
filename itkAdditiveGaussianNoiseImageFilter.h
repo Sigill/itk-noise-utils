@@ -33,10 +33,10 @@ public:
   double GetStandardDeviation() const
     { return m_StandardDeviation; }
 
-  void SetMean(double mean)
+  void SetMean(const double mean)
     { m_Mean = mean; }
 
-  void SetStandardDeviation(double standardDeviation)
+  void SetStandardDeviation(const double standardDeviation)
     { m_StandardDeviation = standardDeviation; }
 
   TOutput GetOutputMinimum() const
@@ -45,10 +45,10 @@ public:
   TOutput GetOutputMaximum() const
     { return m_OutputMaximum; }
 
-  void SetOutputMinimum( TOutput min )
+  void SetOutputMinimum( const TOutput min )
     { m_OutputMinimum = min; }
 
-  void SetOutputMaximum( TOutput max )
+  void SetOutputMaximum( const TOutput max )
     { m_OutputMaximum = max; }
 
   bool operator!=(const AdditiveGaussianNoise &other) const
@@ -121,7 +121,7 @@ public:
   double GetStandardDeviation() const
     { return this->GetFunctor().GetStandardDeviation(); }
 
-  void SetOutputMinimum(OutputPixelType min)
+  void SetOutputMinimum(const OutputPixelType min)
     {
     if ( min == this->GetFunctor().GetOutputMinimum() )
       {
@@ -132,7 +132,7 @@ public:
     this->Modified();
     }
 
-  void SetOutputMaximum(OutputPixelType max)
+  void SetOutputMaximum(const OutputPixelType max)
     {
     if ( max == this->GetFunctor().GetOutputMaximum() )
       {
@@ -143,7 +143,7 @@ public:
     this->Modified();
     }
 
-  void SetMean(double mean)
+  void SetMean(const double mean)
     {
     if ( mean == this->GetFunctor().GetMean() )
       {
@@ -154,7 +154,7 @@ public:
     this->Modified();
     }
 
-  void SetStandardDeviation(double standardDeviation)
+  void SetStandardDeviation(const double standardDeviation)
     {
     if ( standardDeviation == this->GetFunctor().GetStandardDeviation() )
       {
