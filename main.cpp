@@ -13,10 +13,14 @@
 
 #include "itkAdditiveGaussianNoiseImageFilter.h"
 #include "itkSparseAdditiveGaussianNoiseImageFilter.h"
+#include "itkAdditiveUniformNoiseImageFilter.h"
+#include "itkSparseAdditiveUniformNoiseImageFilter.h"
 #include "itkImpulseNoiseImageFilter.h"
 
 typedef itk::AdditiveGaussianNoiseImageFilter< ImageType, ImageType > GaussianNoiseGenerator;
 typedef itk::SparseAdditiveGaussianNoiseImageFilter< ImageType, ImageType > SparseGaussianNoiseGenerator;
+typedef itk::AdditiveUniformNoiseImageFilter< ImageType, ImageType > UniformNoiseGenerator;
+typedef itk::SparseAdditiveUniformNoiseImageFilter< ImageType, ImageType > SparseUniformNoiseGenerator;
 typedef itk::ImpulseNoiseImageFilter< ImageType, ImageType > ImpulseNoiseGenerator;
 
 int main(int argc, char **argv)
@@ -55,18 +59,31 @@ int main(int argc, char **argv)
 	typedef itk::ImageToImageFilter< ImageType, ImageType >::Pointer FilterPointer;
 	FilterPointer noiseFilter;
 
-	if(0 == noise_type.compare("awg")) {
+	if(0 == noise_type.compare("gaussian")) {
 		GaussianNoiseGenerator::Pointer ng = GaussianNoiseGenerator::New();
 		ng->SetInput(image);
 		ng->SetMean(cli_parser.get_mean());
 		ng->SetStandardDeviation(cli_parser.get_stddev());
 		noiseFilter = FilterPointer(ng);
-	} else if(0 == noise_type.compare("sawg")) {
+	} else if(0 == noise_type.compare("sparse-gaussian")) {
 		SparseGaussianNoiseGenerator::Pointer ng = SparseGaussianNoiseGenerator::New();
 		ng->SetInput(image);
 		ng->SetProbability(cli_parser.get_probability());
 		ng->SetMean(cli_parser.get_mean());
 		ng->SetStandardDeviation(cli_parser.get_stddev());
+		noiseFilter = FilterPointer(ng);
+	} else if(0 == noise_type.compare("uniform")) {
+		UniformNoiseGenerator::Pointer ng = UniformNoiseGenerator::New();
+		ng->SetInput(image);
+		ng->SetMean(cli_parser.get_mean());
+		ng->SetAmplitude(cli_parser.get_amplitude());
+		noiseFilter = FilterPointer(ng);
+	} else if(0 == noise_type.compare("sparse-uniform")) {
+		SparseUniformNoiseGenerator::Pointer ng = SparseUniformNoiseGenerator::New();
+		ng->SetInput(image);
+		ng->SetProbability(cli_parser.get_probability());
+		ng->SetMean(cli_parser.get_mean());
+		ng->SetAmplitude(cli_parser.get_amplitude());
 		noiseFilter = FilterPointer(ng);
 	} else if(0 == noise_type.compare("impulse")) {
 		ImpulseNoiseGenerator::Pointer ng = ImpulseNoiseGenerator::New();
@@ -74,7 +91,7 @@ int main(int argc, char **argv)
 		ng->SetProbability(cli_parser.get_probability());
 		noiseFilter = FilterPointer(ng);
 	} else {
-		LOG4CXX_FATAL(logger, "No noise called " << noise_type << " found.");
+		LOG4CXX_FATAL(logger, "No \"" << noise_type << "\" noise found.");
 	}
 
 	if(noiseFilter.IsNotNull()) {

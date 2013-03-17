@@ -58,6 +58,7 @@ public:
 	const std::string get_noise_type() const;
 	const double      get_mean() const;
 	const double      get_stddev() const;
+	const double      get_amplitude() const;
 	const double      get_probability() const;
 
 private:
@@ -65,6 +66,7 @@ private:
 	std::string            noise_type;
 	Double                 mean;
 	StrictlyPositiveDouble stddev;
+	StrictlyPositiveDouble amplitude;
 	StrictlyPositiveDouble probability;
 };
 

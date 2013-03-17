@@ -78,13 +78,16 @@ CliParser::ParseResult CliParser::parse_argv(int argc, char ** argv)
 			"Output image.")
 		("noise-type,n",
 			po::value< std::string >(&(this->noise_type))->required(),
-			"Noise type (awg, sawg, impulse).")
+			"Noise type (gaussian, sparse-gaussian, uniform, sparse-uniform, impulse).")
 		("mean,m",
 			po::value< Double >(&(this->mean))->default_value(0.0),
 			"Mean value of the generated noise.")
 		("stddev,s",
-			po::value< StrictlyPositiveDouble >(&(this->stddev))->default_value(1.0),
-			"Standard deviation value of the generated noise.")
+			po::value< StrictlyPositiveDouble >(&(this->stddev))->default_value(32),
+			"Standard deviation of the generated noise (for gaussian noise).")
+		("amplitude,a",
+			po::value< StrictlyPositiveDouble >(&(this->amplitude))->default_value(32),
+			"Amplitude of the generated noise (for uniform noise).")
 		("probability,p",
 			po::value< StrictlyPositiveDouble >(&(this->probability))->default_value(0.01),
 			"Probability of the generated noise.")
@@ -134,6 +137,9 @@ const double CliParser::get_stddev() const {
 	return this->stddev;
 }
 
+const double CliParser::get_amplitude() const {
+	return this->amplitude;
+}
 
 const double CliParser::get_probability() const {
 	return this->probability;
