@@ -33,7 +33,12 @@ public:
     { return m_Probability; }
 
   void SetProbability(const double probability)
-    { m_Probability = probability; }
+    {
+    if(probability < 0.0 || probability > 1.0)
+      itkGenericExceptionMacro("probability must be between 0 and 1");
+
+    m_Probability = probability;
+    }
 
   double GetMean() const
     { return m_Mean; }
@@ -45,7 +50,12 @@ public:
     { m_Mean = mean; }
 
   void SetStandardDeviation(const double standardDeviation)
-    { m_StandardDeviation = standardDeviation; }
+    {
+    if(standardDeviation <= 0.0)
+      itkGenericExceptionMacro("standard deviation must be strictly positive");
+
+    m_StandardDeviation = standardDeviation;
+    }
 
   TOutput GetOutputMinimum() const
     { return m_OutputMinimum; }
@@ -53,11 +63,14 @@ public:
   TOutput GetOutputMaximum() const
     { return m_OutputMaximum; }
 
-  void SetOutputMinimum( TOutput min )
-    { m_OutputMinimum = min; }
+  void SetOutputBounds( const TOutput min, const TOutput max)
+    {
+    if(max <= min)
+      itkGenericExceptionMacro("invalid bounds: [" << min << "; " << max << "]");
 
-  void SetOutputMaximum( TOutput max )
-    { m_OutputMaximum = max; }
+    m_OutputMinimum = min;
+    m_OutputMaximum = max;
+    }
 
   bool operator!=(const SparseAdditiveGaussianNoise &other) const
     {
@@ -139,25 +152,14 @@ public:
   double GetStandardDeviation() const
     { return this->GetFunctor().GetStandardDeviation(); }
 
-  void SetOutputMinimum(OutputPixelType min)
+  void SetOutputBounds(const OutputPixelType min, const OutputPixelType max)
     {
-    if ( min == this->GetFunctor().GetOutputMinimum() )
+    if ( min == this->GetFunctor().GetOutputMinimum() && max == this->GetFunctor().GetOutputMaximum())
       {
       return;
       }
 
-    this->GetFunctor().SetOutputMinimum(min);
-    this->Modified();
-    }
-
-  void SetOutputMaximum(OutputPixelType max)
-    {
-    if ( max == this->GetFunctor().GetOutputMaximum() )
-      {
-      return;
-      }
-
-    this->GetFunctor().SetOutputMaximum(max);
+    this->GetFunctor().SetOutputBounds(min, max);
     this->Modified();
     }
 

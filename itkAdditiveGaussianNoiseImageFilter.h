@@ -37,7 +37,12 @@ public:
     { m_Mean = mean; }
 
   void SetStandardDeviation(const double standardDeviation)
-    { m_StandardDeviation = standardDeviation; }
+    {
+    if(standardDeviation <= 0.0)
+      itkGenericExceptionMacro("standard deviation must be strictly positive");
+
+    m_StandardDeviation = standardDeviation;
+    }
 
   TOutput GetOutputMinimum() const
     { return m_OutputMinimum; }
@@ -45,11 +50,14 @@ public:
   TOutput GetOutputMaximum() const
     { return m_OutputMaximum; }
 
-  void SetOutputMinimum( const TOutput min )
-    { m_OutputMinimum = min; }
+  void SetOutputBounds( const TOutput min, const TOutput max)
+    {
+    if(max <= min)
+      itkGenericExceptionMacro("invalid bounds: [" << min << "; " << max << "]");
 
-  void SetOutputMaximum( const TOutput max )
-    { m_OutputMaximum = max; }
+    m_OutputMinimum = min;
+    m_OutputMaximum = max;
+    }
 
   bool operator!=(const AdditiveGaussianNoise &other) const
     {
@@ -121,25 +129,14 @@ public:
   double GetStandardDeviation() const
     { return this->GetFunctor().GetStandardDeviation(); }
 
-  void SetOutputMinimum(const OutputPixelType min)
+  void SetOutputBounds(const OutputPixelType min, const OutputPixelType max)
     {
-    if ( min == this->GetFunctor().GetOutputMinimum() )
+    if ( min == this->GetFunctor().GetOutputMinimum() && max == this->GetFunctor().GetOutputMaximum())
       {
       return;
       }
 
-    this->GetFunctor().SetOutputMinimum(min);
-    this->Modified();
-    }
-
-  void SetOutputMaximum(const OutputPixelType max)
-    {
-    if ( max == this->GetFunctor().GetOutputMaximum() )
-      {
-      return;
-      }
-
-    this->GetFunctor().SetOutputMaximum(max);
+    this->GetFunctor().SetOutputBounds(min, max);
     this->Modified();
     }
 
