@@ -10,7 +10,7 @@ namespace itk
 namespace Functor
 {
 /** \class AdditiveGaussianNoise
- * \brief Adds gaussian noise to a pixel.
+ * \brief Adds additive gaussian noise to a pixel.
  * \ingroup ITKImageIntensity
  */
 template< class TInput, class TOutput >
@@ -21,7 +21,7 @@ public:
     {
     m_Mean = 0.0;
     m_StandardDeviation = 1.0;
-    m_OutputMinimum = itk::NumericTraits< TOutput >::min();
+    m_OutputMinimum = itk::NumericTraits< TOutput >::NonpositiveMin();
     m_OutputMaximum = itk::NumericTraits< TOutput >::max();
     }
 

@@ -12,7 +12,9 @@
 #include "log4cxx/basicconfigurator.h"
 
 #include "itkAdditiveGaussianNoiseImageFilter.h"
+#include "itkMultiplicativeGaussianNoiseImageFilter.h"
 #include "itkSparseAdditiveGaussianNoiseImageFilter.h"
+#include "itkSparseMultiplicativeGaussianNoiseImageFilter.h"
 #include "itkAdditiveUniformNoiseImageFilter.h"
 #include "itkSparseAdditiveUniformNoiseImageFilter.h"
 #include "itkImpulseNoiseImageFilter.h"
@@ -22,6 +24,8 @@ typedef itk::SparseAdditiveGaussianNoiseImageFilter< ImageType, ImageType > Spar
 typedef itk::AdditiveUniformNoiseImageFilter< ImageType, ImageType > UniformNoiseGenerator;
 typedef itk::SparseAdditiveUniformNoiseImageFilter< ImageType, ImageType > SparseUniformNoiseGenerator;
 typedef itk::ImpulseNoiseImageFilter< ImageType, ImageType > ImpulseNoiseGenerator;
+typedef itk::MultiplicativeGaussianNoiseImageFilter< ImageType, ImageType > MultiplicativeGaussianNoiseGenerator;
+typedef itk::SparseMultiplicativeGaussianNoiseImageFilter< ImageType, ImageType > SparseMultiplicativeGaussianNoiseGenerator;
 
 int main(int argc, char **argv)
 {
@@ -89,6 +93,19 @@ int main(int argc, char **argv)
 		ImpulseNoiseGenerator::Pointer ng = ImpulseNoiseGenerator::New();
 		ng->SetInput(image);
 		ng->SetProbability(cli_parser.get_probability());
+		noiseFilter = FilterPointer(ng);
+	} else if(0 == noise_type.compare("mult-gaussian")) {
+		MultiplicativeGaussianNoiseGenerator::Pointer ng = MultiplicativeGaussianNoiseGenerator::New();
+		ng->SetInput(image);
+		ng->SetMean(cli_parser.get_mean());
+		ng->SetStandardDeviation(cli_parser.get_stddev());
+		noiseFilter = FilterPointer(ng);
+	} else if(0 == noise_type.compare("sparse-mult-gaussian")) {
+		SparseMultiplicativeGaussianNoiseGenerator::Pointer ng = SparseMultiplicativeGaussianNoiseGenerator::New();
+		ng->SetInput(image);
+		ng->SetProbability(cli_parser.get_probability());
+		ng->SetMean(cli_parser.get_mean());
+		ng->SetStandardDeviation(cli_parser.get_stddev());
 		noiseFilter = FilterPointer(ng);
 	} else {
 		LOG4CXX_FATAL(logger, "No \"" << noise_type << "\" noise found.");

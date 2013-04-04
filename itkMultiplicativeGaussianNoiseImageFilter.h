@@ -1,5 +1,5 @@
-#ifndef __itkAdditiveUniformNoiseImageFilter
-#define __itkAdditiveUniformNoiseImageFilter
+#ifndef __itkMultiplicativeGaussianNoiseImageFilter
+#define __itkMultiplicativeGaussianNoiseImageFilter
 
 #include <itkUnaryFunctorImageFilter.h>
 #include <itkConceptChecking.h>
@@ -9,43 +9,39 @@ namespace itk
 {
 namespace Functor
 {
-/** \class AdditiveUniformNoise
- * \brief Adds additive uniform noise to a pixel.
+/** \class MultiplicativeGaussianNoise
+ * \brief Adds multiplicative gaussian noise to a pixel.
  * \ingroup ITKImageIntensity
  */
 template< class TInput, class TOutput >
-class AdditiveUniformNoise
+class MultiplicativeGaussianNoise
 {
 public:
-  AdditiveUniformNoise()
+  MultiplicativeGaussianNoise()
     {
-    m_Mean = 0.0;
-    m_Amplitude = 1.0;
+    m_Mean = 1.0;
+    m_StandardDeviation = 1.0;
     m_OutputMinimum = itk::NumericTraits< TOutput >::NonpositiveMin();
     m_OutputMaximum = itk::NumericTraits< TOutput >::max();
     }
 
-  ~AdditiveUniformNoise() {}
+  ~MultiplicativeGaussianNoise() {}
 
   double GetMean() const
     { return m_Mean; }
 
-  double GetAmplitude() const
-    { return m_Amplitude; }
+  double GetStandardDeviation() const
+    { return m_StandardDeviation; }
 
   void SetMean(const double mean)
-    {
-    m_Mean = mean;
-    ComputeNoiseRange();
-    }
+    { m_Mean = mean; }
 
-  void SetAmplitude(const double amplitude)
+  void SetStandardDeviation(const double standardDeviation)
     {
-    if(amplitude < 0.0)
-      itkGenericExceptionMacro("amplitude must be positive");
+    if(standardDeviation <= 0.0)
+      itkGenericExceptionMacro("standard deviation must be strictly positive");
 
-    m_Amplitude = amplitude;
-    ComputeNoiseRange();
+    m_StandardDeviation = standardDeviation;
     }
 
   TOutput GetOutputMinimum() const
@@ -63,57 +59,47 @@ public:
     m_OutputMaximum = max;
     }
 
-  bool operator!=(const AdditiveUniformNoise &other) const
+  bool operator!=(const MultiplicativeGaussianNoise &other) const
     {
     return m_Mean != other.m_Mean
-      || m_Amplitude != other.m_Amplitude
+      || m_StandardDeviation != other.m_StandardDeviation
       || m_OutputMaximum != other.m_OutputMaximum
       || m_OutputMinimum != other.m_OutputMinimum;
     }
 
-  bool operator==(const AdditiveUniformNoise & other) const
+  bool operator==(const MultiplicativeGaussianNoise & other) const
     {
     return !( *this != other );
     }
 
   inline TOutput operator()(const TInput & A) const
     {
-    const double v = A + vnl_sample_uniform(m_NoiseMin, m_NoiseMax);
+    double v = A * vnl_sample_normal(m_Mean, m_StandardDeviation);
     return static_cast<TOutput>(v < m_OutputMinimum ? m_OutputMinimum : (v > m_OutputMaximum ? m_OutputMaximum : v));
-    }
-
-private:
-  void ComputeNoiseRange()
-    {
-    m_NoiseMin = m_Mean - m_Amplitude;
-    m_NoiseMax = m_Mean + m_Amplitude;
     }
 
 private:
   TOutput m_OutputMinimum;
   TOutput m_OutputMaximum;
   double m_Mean;
-  double m_Amplitude;
-
-  double m_NoiseMin;
-  double m_NoiseMax;
+  double m_StandardDeviation;
 };
 } // End namespace Functor
 
 template< class TInputImage, class TOutputImage >
-class ITK_EXPORT AdditiveUniformNoiseImageFilter:
+class ITK_EXPORT MultiplicativeGaussianNoiseImageFilter:
   public
   UnaryFunctorImageFilter< TInputImage, TOutputImage,
-                           Functor::AdditiveUniformNoise<
+                           Functor::MultiplicativeGaussianNoise<
                              typename TInputImage::PixelType,
                              typename TOutputImage::PixelType > >
 {
 public:
   /** Standard class typedefs. */
-  typedef AdditiveUniformNoiseImageFilter Self;
+  typedef MultiplicativeGaussianNoiseImageFilter Self;
   typedef UnaryFunctorImageFilter<
     TInputImage, TOutputImage,
-    Functor::AdditiveUniformNoise< typename TInputImage::PixelType,
+    Functor::MultiplicativeGaussianNoise< typename TInputImage::PixelType,
                                     typename TOutputImage::PixelType > >  Superclass;
 
   typedef SmartPointer< Self >       Pointer;
@@ -125,7 +111,7 @@ public:
   itkNewMacro(Self);
 
   /** Macro that provides the GetNameOfClass() method */
-  itkTypeMacro(AdditiveUniformNoiseImageFilter, UnaryFunctorImageFilter);
+  itkTypeMacro(MultiplicativeGaussianNoiseImageFilter, UnaryFunctorImageFilter);
 
   OutputPixelType GetOutputMinimum() const
     {
@@ -140,8 +126,8 @@ public:
   double GetMean() const
     { return this->GetFunctor().GetMean(); }
 
-  double GetAmplitude() const
-    { return this->GetFunctor().GetAmplitude(); }
+  double GetStandardDeviation() const
+    { return this->GetFunctor().GetStandardDeviation(); }
 
   void SetOutputBounds(const OutputPixelType min, const OutputPixelType max)
     {
@@ -165,14 +151,14 @@ public:
     this->Modified();
     }
 
-  void SetAmplitude(const double standardDeviation)
+  void SetStandardDeviation(const double standardDeviation)
     {
-    if ( standardDeviation == this->GetFunctor().GetAmplitude() )
+    if ( standardDeviation == this->GetFunctor().GetStandardDeviation() )
       {
       return;
       }
 
-    this->GetFunctor().SetAmplitude(standardDeviation);
+    this->GetFunctor().SetStandardDeviation(standardDeviation);
     this->Modified();
     }
 
@@ -180,7 +166,7 @@ public:
     {
     Superclass::PrintSelf(os, indent);
     os << indent << "Mean: " << static_cast<typename NumericTraits<double>::PrintType>(GetMean()) << std::endl;
-    os << indent << "Amplitude: " << static_cast<typename NumericTraits<double>::PrintType>(GetAmplitude()) << std::endl;
+    os << indent << "StandardDeviation: " << static_cast<typename NumericTraits<double>::PrintType>(GetStandardDeviation()) << std::endl;
     os << indent << "OutputMinimum: " << static_cast<typename NumericTraits<double>::PrintType>(GetOutputMinimum()) << std::endl;
     os << indent << "OutputMaximum: " << static_cast<typename NumericTraits<double>::PrintType>(GetOutputMaximum()) << std::endl;
     }
@@ -193,14 +179,14 @@ public:
 #endif
 
 protected:
-  AdditiveUniformNoiseImageFilter() {}
-  virtual ~AdditiveUniformNoiseImageFilter() {}
+  MultiplicativeGaussianNoiseImageFilter() {}
+  virtual ~MultiplicativeGaussianNoiseImageFilter() {}
 
 private:
-  AdditiveUniformNoiseImageFilter(const Self &); //purposely not implemented
+  MultiplicativeGaussianNoiseImageFilter(const Self &); //purposely not implemented
   void operator=(const Self &);     //purposely not implemented
 };
 
 } // End namespace itk
 
-#endif /* __itkAdditiveUniformNoiseImageFilter */
+#endif /* __itkMultiplicativeGaussianNoiseImageFilter */

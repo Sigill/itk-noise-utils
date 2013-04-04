@@ -78,7 +78,7 @@ CliParser::ParseResult CliParser::parse_argv(int argc, char ** argv)
 			"Output image.")
 		("noise-type,n",
 			po::value< std::string >(&(this->noise_type))->required(),
-			"Noise type (gaussian, sparse-gaussian, uniform, sparse-uniform, impulse).")
+			"Noise type (gaussian, sparse-gaussian, uniform, sparse-uniform, impulse, mult-gaussian, sparse-mult-gaussian).")
 		("mean,m",
 			po::value< Double >(&(this->mean))->default_value(0.0),
 			"Mean value of the generated noise.")

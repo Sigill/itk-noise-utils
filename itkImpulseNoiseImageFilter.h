@@ -19,7 +19,7 @@ class ImpulseNoise
 public:
   ImpulseNoise() {
     m_Probability = 0.01;
-    m_OutputMinimum = itk::NumericTraits< TOutput >::min();
+    m_OutputMinimum = itk::NumericTraits< TOutput >::NonpositiveMin();
     m_OutputMaximum = itk::NumericTraits< TOutput >::max();
   }
   ~ImpulseNoise() {}

@@ -10,7 +10,7 @@ namespace itk
 namespace Functor
 {
 /** \class SparseAdditiveUniformNoise
- * \brief Randomly adds uniform noise to a pixel.
+ * \brief Randomly adds additive uniform noise to a pixel.
  * The probability to alter a pixel is user-defined.
  * \ingroup ITKImageIntensity
  */
@@ -23,7 +23,7 @@ public:
     m_Probability = 1.0;
     m_Mean = 0.0;
     m_Amplitude = 1.0;
-    m_OutputMinimum = itk::NumericTraits< TOutput >::min();
+    m_OutputMinimum = itk::NumericTraits< TOutput >::NonpositiveMin();
     m_OutputMaximum = itk::NumericTraits< TOutput >::max();
     }
 
