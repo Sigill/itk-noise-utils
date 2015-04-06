@@ -79,9 +79,6 @@ CliParser::ParseResult CliParser::parse_argv(int argc, char ** argv)
 		("noise-type,n",
 			po::value< std::string >(&(this->noise_type))->required(),
 			"Noise type (gaussian, sparse-gaussian, uniform, sparse-uniform, impulse, mult-gaussian, sparse-mult-gaussian).")
-		("mean,m",
-			po::value< Double >(&(this->mean))->default_value(0.0),
-			"Mean value of the generated noise.")
 		("stddev,s",
 			po::value< StrictlyPositiveDouble >(&(this->stddev))->default_value(32),
 			"Standard deviation of the generated noise (for gaussian noise).")
@@ -127,10 +124,6 @@ const std::string CliParser::get_output_image() const
 const std::string CliParser::get_noise_type() const
 {
 	return this->noise_type;
-}
-
-const double CliParser::get_mean() const {
-	return this->mean;
 }
 
 const double CliParser::get_stddev() const {

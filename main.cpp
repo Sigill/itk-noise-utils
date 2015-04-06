@@ -66,27 +66,27 @@ int main(int argc, char **argv)
 	if(0 == noise_type.compare("gaussian")) {
 		GaussianNoiseGenerator::Pointer ng = GaussianNoiseGenerator::New();
 		ng->SetInput(image);
-		ng->SetMean(cli_parser.get_mean());
+		ng->SetMean(0.0);
 		ng->SetStandardDeviation(cli_parser.get_stddev());
 		noiseFilter = FilterPointer(ng);
 	} else if(0 == noise_type.compare("sparse-gaussian")) {
 		SparseGaussianNoiseGenerator::Pointer ng = SparseGaussianNoiseGenerator::New();
 		ng->SetInput(image);
 		ng->SetProbability(cli_parser.get_probability());
-		ng->SetMean(cli_parser.get_mean());
+		ng->SetMean(0.0);
 		ng->SetStandardDeviation(cli_parser.get_stddev());
 		noiseFilter = FilterPointer(ng);
 	} else if(0 == noise_type.compare("uniform")) {
 		UniformNoiseGenerator::Pointer ng = UniformNoiseGenerator::New();
 		ng->SetInput(image);
-		ng->SetMean(cli_parser.get_mean());
+		ng->SetMean(0.0);
 		ng->SetAmplitude(cli_parser.get_amplitude());
 		noiseFilter = FilterPointer(ng);
 	} else if(0 == noise_type.compare("sparse-uniform")) {
 		SparseUniformNoiseGenerator::Pointer ng = SparseUniformNoiseGenerator::New();
 		ng->SetInput(image);
 		ng->SetProbability(cli_parser.get_probability());
-		ng->SetMean(cli_parser.get_mean());
+		ng->SetMean(0.0);
 		ng->SetAmplitude(cli_parser.get_amplitude());
 		noiseFilter = FilterPointer(ng);
 	} else if(0 == noise_type.compare("impulse")) {
@@ -97,27 +97,25 @@ int main(int argc, char **argv)
 	} else if(0 == noise_type.compare("mult-gaussian")) {
 		MultiplicativeGaussianNoiseGenerator::Pointer ng = MultiplicativeGaussianNoiseGenerator::New();
 		ng->SetInput(image);
-		ng->SetMean(cli_parser.get_mean());
+		ng->SetMean(1.0);
 		ng->SetStandardDeviation(cli_parser.get_stddev());
 		noiseFilter = FilterPointer(ng);
 	} else if(0 == noise_type.compare("sparse-mult-gaussian")) {
 		SparseMultiplicativeGaussianNoiseGenerator::Pointer ng = SparseMultiplicativeGaussianNoiseGenerator::New();
 		ng->SetInput(image);
 		ng->SetProbability(cli_parser.get_probability());
-		ng->SetMean(cli_parser.get_mean());
+		ng->SetMean(1.0);
 		ng->SetStandardDeviation(cli_parser.get_stddev());
 		noiseFilter = FilterPointer(ng);
 	} else {
 		LOG4CXX_FATAL(logger, "No \"" << noise_type << "\" noise found.");
 	}
 
-	if(noiseFilter.IsNotNull()) {
-		noiseFilter->Update();
+	noiseFilter->Update();
 
-		LOG4CXX_DEBUG(logger, "Noise generated");
+	LOG4CXX_DEBUG(logger, "Noise generated");
 
-		ImageWriter::write(noiseFilter->GetOutput(), cli_parser.get_output_image());
-	}
+	ImageWriter::write(noiseFilter->GetOutput(), cli_parser.get_output_image());
 
 	return 0;
 }
